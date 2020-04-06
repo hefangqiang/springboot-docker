@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.2.6.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.hfq.docker</groupId>
+    <artifactId>springboot-docker</artifactId>
+    <version>0.0.1</version>
+    <name>springboot-docker</name>
+    <description>Demo project for Spring Boot</description>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <!-- docker私有仓库地址 -->
+        <docker.image.prefix>192.168.161.150:5000</docker.image.prefix>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!--引入docker插件-->
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.4.13</version>
+                <configuration>
+                    <!-- 生成的镜像名，格式[私有仓库:镜像名]，可以直接上传到该私有仓库-->
+                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <!-- 生成的镜像版本 -->
+                    <imageTags>
+                        <imageTag>latest</imageTag>
+                    </imageTags>
+                    <!-- 指定我们项目中Dockerfile文件的路径 -->
+                    <dockerDirectory>${project.basedir}</dockerDirectory>
+                    <!-- 指定远程docker服务的API接口，我这里使用了本地window的 -->
+                    <dockerHost>https://192.168.99.100:2376</dockerHost>
+                    <!-- 指定docker服务的对应的证书，如果使用http就不用配置了 -->
+                    <dockerCertPath>C:\Users\DellPC\.docker\machine\machines\default</dockerCertPath>
+                    <resources>
+                        <resource>
+                            <!--jar包所在的路径，此处配置的即对应项目中target目录-->
+                            <directory>${project.build.directory}</directory>
+                            <!-- 需要包含的 jar包，这里对应的是Dockerfile中添加的文件名　-->
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
